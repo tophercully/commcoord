@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 // import "./globals.css";
 import "./output.css";
 import { Analytics } from "@vercel/analytics/next";
+import { NotifProvider } from "@/contexts/notificationContext";
+import { AuthProvider } from "@/contexts/authContext";
 
 const overusedGrotesk = localFont({
   src: "./fonts/OverusedGrotesk-VF.ttf",
@@ -21,13 +23,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${overusedGrotesk.className} flex h-fit min-h-[100svh] w-screen flex-col items-center justify-center overflow-y-auto p-4 pt-0 antialiased md:p-10`}
-      >
-        {children}
-        <Analytics />
-      </body>
-    </html>
+    <NotifProvider>
+      <AuthProvider>
+        <html lang="en">
+          <body
+            className={`${overusedGrotesk.className} flex h-fit min-h-[100svh] w-screen flex-col items-center justify-center overflow-y-auto p-4 pt-0 antialiased md:p-10`}
+          >
+            {children}
+            <Analytics />
+          </body>
+        </html>
+      </AuthProvider>
+    </NotifProvider>
   );
 }
