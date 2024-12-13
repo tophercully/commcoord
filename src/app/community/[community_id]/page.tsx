@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Community } from "@/types/communities";
 import { api } from "@/util/API/firebaseAPI";
+import ChatChannel from "@/components/messaging/Channel";
+import ListChannels from "@/components/messaging/ListChannels";
 
 async function fetchCommunity(community_id: string): Promise<Community | null> {
   try {
@@ -58,6 +60,8 @@ export default async function CommunityPage({
       <div>
         <p>{community.description}</p>
       </div>
+      <ListChannels communityId={community_id} />
+      <ChatChannel channelId={community_id} />
     </div>
   );
 }

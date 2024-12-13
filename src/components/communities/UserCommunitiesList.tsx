@@ -42,12 +42,17 @@ const UserCommunitiesList = () => {
       <h2>Your communities:</h2>
       {communities.map((community: Community) => (
         <Link
-          className="hover:underline"
+          className="group"
           href={`/community/${community.id}`}
           key={community.id}
           prefetch
         >
-          {community.name}
+          <div className="flex flex-col border border-black">
+            <p className="bg-black px-4 py-2 text-2xl text-white group-hover:underline">
+              {community.name}
+            </p>
+            <p className="p-4">{community.description}</p>
+          </div>
         </Link>
       ))}
     </div>
