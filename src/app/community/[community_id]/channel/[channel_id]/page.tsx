@@ -5,6 +5,7 @@ import { Community } from "@/types/communities";
 import { api } from "@/util/API/firebaseAPI";
 import { ChatChannel } from "@/types/chats";
 import Channel from "@/components/messaging/Channel";
+import Link from "next/link";
 
 async function fetchCommunity(communityId: string): Promise<Community | null> {
   try {
@@ -67,12 +68,24 @@ export default async function ChannelPage({
   }
 
   return (
-    <div>
-      <h1>
-        {channel.name} Channel in {community.name} Community
-      </h1>
-      <div>
-        <p>{community.description}</p>
+    <div className="flex w-full max-w-[80ch] flex-col gap-8">
+      <div
+        id="community-info"
+        className="flex flex-col gap-2"
+      >
+        <span className="text-base-500">
+          <Link
+            href={`/community/${community_id}`}
+            className="hover:underline"
+            prefetch
+          >
+            {community.name}
+          </Link>
+          <span> / </span>
+          <span>{channel.name}</span>
+        </span>
+        <p>{channel.description}</p>
+        <div></div>
       </div>
       <Channel channelId={channel_id} />
     </div>

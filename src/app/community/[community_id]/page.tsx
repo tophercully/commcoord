@@ -61,7 +61,7 @@ export default async function CommunityPage({
         <p>{community.description}</p>
       </div>
       <ListChannels communityId={community_id} />
-      <ChatChannel channelId={community_id} />
+      {/* <ChatChannel channelId={community_id} /> */}
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   off,
 } from "firebase/database";
 import { User } from "firebase/auth";
-
 import { ChatChannel, ChatMessage } from "@/types/chats";
 import { rtdb } from "../../../firebaseConfig";
 
@@ -30,6 +29,8 @@ export const messagesAPI = {
       createdBy: user.uid,
     };
     await set(channelRef, newChannel);
+    await this.addMember(newChannel.id, user.uid);
+
     return newChannel;
   },
   async getChannels(communityId: string): Promise<ChatChannel[]> {
@@ -46,29 +47,79 @@ export const messagesAPI = {
 
     return channels;
   },
-  async getChannelMembers(
-    channelId: string,
-  ): Promise<{ id: string; displayName: string }[]> {
-    const membersRef = ref(rtdb, `channels/${channelId}/members`);
-    const snapshot = await get(membersRef);
-    const members: { id: string; displayName: string }[] = [];
+  async getChannelsForMember(
+    communityId: string,
+    userId: string,
+  ): Promise<ChatChannel[]> {
+    const channelsRef = ref(rtdb, "channels");
+    const snapshot = await get(channelsRef);
+    const channels: ChatChannel[] = [];
 
     snapshot.forEach((childSnapshot) => {
-      const member = childSnapshot.val();
-      members.push({ id: childSnapshot.key!, displayName: member.displayName });
+      const channel = childSnapshot.val() as ChatChannel;
+      if (channel.communityId === communityId) {
+        channels.push(channel);
+      }
     });
 
-    return members;
+    const memberChannels: ChatChannel[] = [];
+    for (const channel of channels) {
+      const memberRef = ref(rtdb, `channel_members/${channel.id}/${userId}`);
+      const memberSnapshot = await get(memberRef);
+      if (memberSnapshot.exists()) {
+        memberChannels.push(channel);
+      }
+    }
+
+    return memberChannels;
   },
-  async addMember(
+  async getUserDisplayName(userId: string): Promise<string | null> {
+    try {
+      const userRef = ref(rtdb, `users/${userId}/displayName`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        console.log(`Display name found for user ${userId}: ${snapshot.val()}`);
+        return snapshot.val();
+      }
+      console.log(`No display name found for user ${userId}`);
+      return null;
+    } catch (error) {
+      console.error(`Failed to fetch display name for user ${userId}:`, error);
+      return null;
+    }
+  },
+  async getUserDisplayNames(
+    userIds: string[],
+  ): Promise<{ id: string; displayName: string | null }[]> {
+    const displayNames = await Promise.all(
+      userIds.map(async (userId) => {
+        const displayName = await this.getUserDisplayName(userId);
+        return { id: userId, displayName };
+      }),
+    );
+    return displayNames;
+  },
+  async getChannelMembers(
     channelId: string,
-    member: { id: string; displayName: string },
-  ): Promise<void> {
-    const membersRef = ref(rtdb, `channels/${channelId}/members/${member.id}`);
-    await set(membersRef, member);
+  ): Promise<{ id: string; displayName: string | null }[]> {
+    const membersRef = ref(rtdb, `channel_members/${channelId}`);
+    const snapshot = await get(membersRef);
+    const memberIds: string[] = [];
+
+    snapshot.forEach((childSnapshot) => {
+      memberIds.push(childSnapshot.key!);
+    });
+
+    const membersWithDisplayNames =
+      await messagesAPI.getUserDisplayNames(memberIds);
+    return membersWithDisplayNames;
+  },
+  async addMember(channelId: string, memberId: string): Promise<void> {
+    const membersRef = ref(rtdb, `channel_members/${channelId}/${memberId}`);
+    await set(membersRef, true);
   },
   async removeMember(channelId: string, memberId: string): Promise<void> {
-    const memberRef = ref(rtdb, `channels/${channelId}/members/${memberId}`);
+    const memberRef = ref(rtdb, `channel_members/${channelId}/${memberId}`);
     await set(memberRef, null);
   },
   async getChannelInfo(channelId: string): Promise<ChatChannel | null> {
