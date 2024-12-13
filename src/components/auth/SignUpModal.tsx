@@ -44,7 +44,7 @@ const SignUpModal: React.FC<Props> = ({ open, onClose, onPressSignIn }) => {
       <Modal
         open={open}
         onClose={onClose}
-        maxWidth="40ch"
+        contentClassName="max-w-[40ch]"
       >
         <form
           onSubmit={handleSubmit}

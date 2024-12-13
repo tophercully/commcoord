@@ -7,14 +7,13 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { getAuth, User, UserInfo, updateProfile } from "firebase/auth";
+import { getAuth, User, updateProfile } from "firebase/auth";
 import { api } from "@/util/API/firebaseAPI";
 import { app } from "../../firebaseConfig";
 const auth = getAuth(app);
 
 interface AuthContextProps {
   user: User | null;
-  userInfo: UserInfo | null;
   updateUserProfile: (displayName?: string, photoURL?: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -32,7 +31,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [authInitializing, setAuthInitializing] = useState(true); // Initialize to true
   const [showSignIn, setShowSignIn] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
@@ -43,7 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        setUserInfo(parsedUser.providerData[0]);
       }
     }
     setAuthInitializing(false); // Set to false after checking localStorage
@@ -66,7 +63,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const loggedInUser = await api.auth.signIn(email, password);
       if (loggedInUser.user) {
         setUser(loggedInUser.user);
-        setUserInfo(loggedInUser.user.providerData[0]);
         localStorage.setItem("user", JSON.stringify(loggedInUser.user));
       } else {
         console.error("Error signing in:", loggedInUser);
@@ -82,7 +78,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       await api.auth.logOut();
       setUser(null);
-      setUserInfo(null);
       localStorage.removeItem("user");
       setShowSignIn(false);
       setShowSignUp(false);
@@ -110,7 +105,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const updatedUser = auth.currentUser;
         if (updatedUser) {
           setUser(updatedUser);
-          setUserInfo(updatedUser.providerData[0]);
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
       }
@@ -137,7 +131,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     <AuthContext.Provider
       value={{
         user,
-        userInfo,
         updateUserProfile,
         signUp: signUpUser,
         signIn: signInUser,

@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 const AuthDisplay = () => {
   const {
     user,
-    userInfo,
     toggleSignInModal,
     toggleSignUpModal,
     showSignIn,
@@ -16,19 +15,19 @@ const AuthDisplay = () => {
     signOut,
   } = useAuth();
   const [showCreateProfile, setShowCreateProfile] = useState(false);
-  console.log(userInfo?.displayName);
+  console.log(user?.displayName);
 
   useEffect(() => {
-    if (user && !userInfo?.displayName) {
+    if (user && !user?.displayName) {
       setShowCreateProfile(true);
     }
-  }, [user, userInfo]);
+  }, [user]);
 
   return (
-    <div className="w-full">
+    <div className="flex w-full gap-2">
       {user ?
         <>
-          <h1>Welcome {userInfo?.displayName}!</h1>
+          <h1>Welcome {user?.displayName}!</h1>
           <button onClick={signOut}>Log out</button>
           <CreateUserProfileModal
             open={showCreateProfile}
@@ -55,8 +54,18 @@ const AuthDisplay = () => {
             }}
           />
 
-          <button onClick={toggleSignInModal}>Log in</button>
-          <button onClick={toggleSignUpModal}>Sign up</button>
+          <button
+            onClick={toggleSignUpModal}
+            className="rounded-lg bg-base-950 px-2 py-1 text-base-50 hover:bg-base-700"
+          >
+            Sign up
+          </button>
+          <button
+            onClick={toggleSignInModal}
+            className="rounded-lg px-2 py-1 hover:underline"
+          >
+            Log in
+          </button>
         </>
       }
     </div>

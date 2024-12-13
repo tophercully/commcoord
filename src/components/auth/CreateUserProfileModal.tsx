@@ -38,7 +38,7 @@ const CreateUserProfileModal: React.FC<Props> = ({ open, onClose }) => {
     <Modal
       open={open}
       onClose={onClose}
-      maxWidth="40ch"
+      contentClassName="max-w-[40ch]"
     >
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold">Create a profile</h1>

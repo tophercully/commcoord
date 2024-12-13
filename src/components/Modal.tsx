@@ -7,14 +7,12 @@ const Modal = ({
   open,
   onClose,
   children,
-  contentClassName = "p-4 md:p-10",
-  maxWidth = "60ch",
+  contentClassName = "max-w-[60ch]",
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   contentClassName?: string;
-  maxWidth?: string;
 }) => {
   // Control mounting/unmounting
   const [mounted, setMounted] = useState(false);
@@ -57,7 +55,7 @@ const Modal = ({
       onMouseDown={handleOutsideClick}
     >
       <div
-        className={`relative flex max-h-[90vh] w-full max-w-[${"60ch"}] flex-col gap-6 rounded-xl bg-white shadow-xl transition-all duration-300 ease-in-out dark:bg-base-900 ${contentClassName} ${
+        className={`relative flex max-h-[90vh] w-full flex-col gap-6 rounded-xl bg-white p-4 shadow-xl transition-all duration-300 ease-in-out md:p-10 dark:bg-base-900 ${contentClassName} ${
           isAnimating ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
         }`}
       >
