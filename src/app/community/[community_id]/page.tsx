@@ -17,9 +17,10 @@ async function fetchCommunity(community_id: string): Promise<Community | null> {
 export async function generateMetadata({
   params,
 }: {
-  params: { community_id: string };
+  params: Promise<{ community_id: string }>;
 }): Promise<Metadata> {
-  const community = await fetchCommunity(params.community_id);
+  const { community_id } = await params;
+  const community = await fetchCommunity(community_id);
 
   if (!community) {
     return {
@@ -42,9 +43,10 @@ export async function generateMetadata({
 export default async function CommunityPage({
   params,
 }: {
-  params: { community_id: string };
+  params: Promise<{ community_id: string }>;
 }) {
-  const community = await fetchCommunity(params.community_id);
+  const { community_id } = await params;
+  const community = await fetchCommunity(community_id);
 
   if (!community) {
     notFound();

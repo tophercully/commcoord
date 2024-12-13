@@ -1,4 +1,4 @@
-import { CommunityForm } from "@/types/communities";
+import { Community, CommunityForm } from "@/types/communities";
 import { User } from "firebase/auth";
 import {
   arrayUnion,
@@ -8,6 +8,9 @@ import {
   updateDoc,
   collection,
   addDoc,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
 
@@ -38,6 +41,32 @@ const communityAPI = {
     );
     await communityAPI.addMember(newCommunityRef.id, founderId);
     return newCommunityRef.id;
+  },
+  getUserCommunities: async (userId: User["uid"]) => {
+    const communityMembersRef = collection(db, "community_members");
+    const communitiesRef = collection(db, "communities");
+
+    const memberQuery = query(
+      communityMembersRef,
+      where("members", "array-contains", userId),
+    );
+
+    const memberSnapshot = await getDocs(memberQuery);
+    const communityIds = memberSnapshot.docs.map((doc) => doc.id);
+
+    if (communityIds.length === 0) return [];
+
+    const communitiesQuery = query(
+      communitiesRef,
+      where("__name__", "in", communityIds),
+    );
+
+    const communitiesSnapshot = await getDocs(communitiesQuery);
+
+    return communitiesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Community[];
   },
 };
 

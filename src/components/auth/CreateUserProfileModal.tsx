@@ -10,7 +10,7 @@ interface Props {
 
 const CreateUserProfileModal: React.FC<Props> = ({ open, onClose }) => {
   const { showNotif } = useNotif();
-  const { user, updateUserProfile } = useAuth();
+  const { updateUserProfile } = useAuth();
   const [form, setForm] = useState({
     username: "",
   });
@@ -42,7 +42,7 @@ const CreateUserProfileModal: React.FC<Props> = ({ open, onClose }) => {
     >
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold">Create a profile</h1>
-        <p className="text-base-400">Welcome! Let's create your profile.</p>
+        <p className="text-base-400">{`Welcome! Let's create your profile.`}</p>
         <form onSubmit={handleUpdateProfile}>
           <input
             type="text"
