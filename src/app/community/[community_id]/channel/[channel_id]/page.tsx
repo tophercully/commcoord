@@ -4,8 +4,8 @@ import { Community } from "@/types/communities";
 
 import { api } from "@/util/API/firebaseAPI";
 import { ChatChannel } from "@/types/chats";
-import Channel from "@/components/messaging/Channel";
 import Link from "next/link";
+import ChannelsAndExplorer from "@/components/communities/ChannelsAndExplorer";
 
 async function fetchCommunity(communityId: string): Promise<Community | null> {
   try {
@@ -44,7 +44,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${channel.name} - ${community.name} Community`,
+    title: `${community.name} - ${channel.name} `,
     description: `Chat in the ${channel.name} channel of the ${community.name} community`,
     openGraph: {
       title: `${channel.name} - ${community.name} Community`,
@@ -68,7 +68,7 @@ export default async function ChannelPage({
   }
 
   return (
-    <div className="flex w-full max-w-[80ch] flex-col gap-8">
+    <div className="flex h-[90svh] w-full flex-col gap-8">
       <div
         id="community-info"
         className="flex flex-col gap-2"
@@ -85,9 +85,11 @@ export default async function ChannelPage({
           <span>{channel.name}</span>
         </span>
         <p>{channel.description}</p>
-        <div></div>
       </div>
-      <Channel channelId={channel_id} />
+      <ChannelsAndExplorer
+        communityId={community_id}
+        channelId={channel_id}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import CreateChannelModal from "./CreateChannelModal";
 import { useAuth } from "@/contexts/authContext";
 import { User } from "firebase/auth";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface ListChannelsProps {
   communityId: string;
@@ -13,6 +14,7 @@ interface ListChannelsProps {
 
 const ListChannels: React.FC<ListChannelsProps> = ({ communityId }) => {
   const { user } = useAuth();
+  const { channel_id } = useParams();
   const [channels, setChannels] = useState<ChatChannel[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,24 +40,24 @@ const ListChannels: React.FC<ListChannelsProps> = ({ communityId }) => {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="mb-4 text-2xl font-bold">Channels</h2>
-      <ul className="mb-4">
+    <div className="flex flex-col gap-4 border px-4 py-2">
+      <h2 className="text-2xl font-bold">Channels</h2>
+      <ul className="flex flex-col gap-2">
         {channels.map((channel) => (
           <Link
             href={`/community/${communityId}/channel/${channel.id}`}
             key={channel.id}
-            className="mb-2 rounded border p-2"
+            className={`rounded p-2 text-sm text-base-400 hover:underline ${channel_id === channel.id ? "bg-base-150" : ""}`}
           >
             {channel.name}
           </Link>
         ))}
       </ul>
       <button
-        className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+        className="rounded bg-blue-500 px-2 py-1 text-sm text-white hover:bg-blue-600"
         onClick={() => setIsModalOpen(true)}
       >
-        Create New Channel
+        New Channel
       </button>
       <CreateChannelModal
         user={user as User}

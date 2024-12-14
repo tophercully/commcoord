@@ -3,6 +3,7 @@ export interface UserProfileForm {
   displayName?: string;
   photoURL?: string;
   bio?: string;
+  pronouns?: string;
 }
 export interface UserProfile extends UserProfileForm {
   uid: string;

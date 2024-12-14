@@ -11,6 +11,7 @@ import {
 import { User } from "firebase/auth";
 import { ChatChannel, ChatMessage } from "@/types/chats";
 import { rtdb } from "../../../firebaseConfig";
+import { api } from "./firebaseAPI";
 
 export interface MessageSubscription {
   unsubscribe: () => void;
@@ -88,16 +89,23 @@ export const messagesAPI = {
       return null;
     }
   },
-  async getUserDisplayNames(
+  async getMemberProfiles(
     userIds: string[],
   ): Promise<{ id: string; displayName: string | null }[]> {
-    const displayNames = await Promise.all(
+    const profiles = await Promise.all(
       userIds.map(async (userId) => {
-        const displayName = await this.getUserDisplayName(userId);
-        return { id: userId, displayName };
+        const userProfile = await api.auth.getUserProfile(userId);
+        return {
+          id: userId,
+          displayName: userProfile.displayName || "",
+          photoURL: userProfile.photoURL || "",
+          email: userProfile.email || "",
+          bio: userProfile.bio || "",
+          pronouns: userProfile.pronouns || "",
+        };
       }),
     );
-    return displayNames;
+    return profiles;
   },
   async getChannelMembers(
     channelId: string,
@@ -110,8 +118,7 @@ export const messagesAPI = {
       memberIds.push(childSnapshot.key!);
     });
 
-    const membersWithDisplayNames =
-      await messagesAPI.getUserDisplayNames(memberIds);
+    const membersWithDisplayNames = await this.getMemberProfiles(memberIds);
     return membersWithDisplayNames;
   },
   async addMember(channelId: string, memberId: string): Promise<void> {

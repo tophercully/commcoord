@@ -4,9 +4,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { app, rtdb } from "../../../firebaseConfig";
-import { ref, set, get } from "firebase/database";
+import { app, db } from "../../../firebaseConfig";
 import { UserProfile } from "@/types/users";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const auth = getAuth(app);
 
@@ -55,8 +55,8 @@ export const authAPI = {
   },
   updateUserProfile: async (userId: string, userInfo: Partial<UserProfile>) => {
     try {
-      const userRef = ref(rtdb, `users/${userId}`);
-      await set(userRef, userInfo);
+      const userDocRef = doc(db, "users", userId);
+      await setDoc(userDocRef, userInfo, { merge: true });
       return { message: "User info updated successfully" };
     } catch (error: any) {
       console.error("Update user error:", error);
@@ -65,9 +65,13 @@ export const authAPI = {
   },
   getUserProfile: async (userId: string) => {
     try {
-      const userRef = ref(rtdb, `users/${userId}`);
-      const snapshot = await get(userRef);
-      return snapshot.val();
+      const userDocRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        return userDoc.data();
+      } else {
+        throw new Error("User not found");
+      }
     } catch (error: any) {
       console.error("Get user error:", error);
       throw new Error(error.message || "Internal Server Error");
