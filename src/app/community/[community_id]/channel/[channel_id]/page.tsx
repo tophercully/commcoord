@@ -68,7 +68,7 @@ export default async function ChannelPage({
   }
 
   return (
-    <div className="flex h-[90svh] w-full flex-col gap-8">
+    <div className="flex w-full flex-col gap-8 md:h-[90svh]">
       <div
         id="community-info"
         className="flex flex-col gap-2"

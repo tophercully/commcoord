@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/authContext";
 import { User } from "firebase/auth";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import Loader from "../Loader";
 
 interface ListChannelsProps {
   communityId: string;
@@ -36,7 +37,7 @@ const ListChannels: React.FC<ListChannelsProps> = ({ communityId }) => {
   }, [communityId]);
 
   if (loading) {
-    return <div>Loading channels...</div>;
+    return <Loader />;
   }
 
   return (

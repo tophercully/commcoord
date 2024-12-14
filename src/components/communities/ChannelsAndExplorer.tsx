@@ -12,7 +12,7 @@ const ChannelsAndExplorer: React.FC<ChannelsAndExplorerProps> = ({
   channelId,
 }) => {
   return (
-    <div className="flex h-full gap-4 rounded-lg border border-base-150 p-4 shadow-md">
+    <div className="flex h-full flex-col gap-4 rounded-lg border border-base-150 p-4 shadow-md md:flex-row">
       <ListChannels communityId={communityId} />
       <Channel channelId={channelId} />
     </div>

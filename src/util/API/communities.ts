@@ -34,6 +34,30 @@ const communityAPI = {
       });
     }
   },
+  getMembers: async (communityId: string) => {
+    const communityMembersRef = doc(db, "community_members", communityId);
+    const communityMembersDoc = await getDoc(communityMembersRef);
+
+    if (communityMembersDoc.exists()) {
+      return communityMembersDoc.data().members as User["uid"][];
+    }
+
+    return [];
+  },
+  checkMember: async (
+    communityId: string,
+    userId: User["uid"],
+  ): Promise<boolean> => {
+    const communityMembersRef = doc(db, "community_members", communityId);
+    const communityMembersDoc = await getDoc(communityMembersRef);
+
+    if (communityMembersDoc.exists()) {
+      const members = communityMembersDoc.data().members as User["uid"][];
+      return members.includes(userId);
+    }
+
+    return false;
+  },
   createCommunity: async (community: CommunityForm, founderId: User["uid"]) => {
     const newCommunityRef = await addDoc(
       collection(db, "communities"),

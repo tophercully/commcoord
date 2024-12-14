@@ -5,7 +5,9 @@ import { ChatMessage } from "@/types/chats";
 import { api } from "@/util/API/firebaseAPI";
 import ProfileCardModal from "../users/ProfileCardModal";
 import { UserProfile } from "@/types/users";
-import Message from "./Message";
+import Messages from "./Messages";
+import Loader from "../Loader";
+import { useAuth } from "@/contexts/authContext";
 
 interface ChatChannelProps {
   channelId: string;
@@ -13,8 +15,10 @@ interface ChatChannelProps {
 
 const ChatChannel: React.FC<ChatChannelProps> = ({ channelId }) => {
   const auth = getAuth();
-  const user = auth.currentUser;
+  const { user, authInitializing } = useAuth();
+
   const [messages, setMessages] = useState<Record<string, ChatMessage>>({});
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [members, setMembers] = useState<UserProfile[]>([]);
   const [profileToDisplay, setProfileToDisplay] = useState<UserProfile | null>(
     null,
@@ -51,6 +55,7 @@ const ChatChannel: React.FC<ChatChannelProps> = ({ channelId }) => {
           }));
         },
       );
+      setMessagesLoading(false);
     };
 
     initializeChannel();
@@ -96,7 +101,7 @@ const ChatChannel: React.FC<ChatChannelProps> = ({ channelId }) => {
   };
 
   const isMember = members.some((member) => member.uid === user?.uid);
-  if (!isMember) {
+  if (user && !authInitializing && !isMember && !messagesLoading) {
     return (
       <button
         onClick={async () => {
@@ -129,34 +134,15 @@ const ChatChannel: React.FC<ChatChannelProps> = ({ channelId }) => {
   return (
     <div
       id="channel-chat"
-      className="flex h-full w-full flex-col justify-end gap-8"
+      className="flex h-full max-h-[90svh] w-full flex-col justify-end gap-8 overflow-y-scroll"
     >
-      <div
-        id="messages"
-        className="mt-auto flex h-full flex-col justify-end gap-2"
-      >
-        {Object.values(messages).map((message, index) => {
-          const lastMessageAuthor = Object.values(messages)[index - 1]?.userId;
-          const minuteSent = Math.floor(message.timestamp / 60000);
-          const lastMessageSent = Math.floor(
-            Object.values(messages)[index - 1]?.timestamp / 60000,
-          );
-          return (
-            <Message
-              key={message.id}
-              message={message}
-              handleClickProfile={() => handleClickProfile(message.userId)}
-              memberProfile={
-                members.find((m) => m.uid === message.userId) as UserProfile
-              }
-              contentOnly={
-                message.userId == lastMessageAuthor &&
-                minuteSent == lastMessageSent
-              }
-            />
-          );
-        })}
-      </div>
+      {!messagesLoading ?
+        <Messages
+          messages={Object.values(messages)}
+          members={members}
+          handleClickProfile={handleClickProfile}
+        />
+      : <Loader />}
       <form
         onSubmit={handleSendMessage}
         id="message-input"

@@ -1,10 +1,8 @@
-// app/community/[community_id]/page.tsx
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Community } from "@/types/communities";
 import { api } from "@/util/API/firebaseAPI";
-import ChatChannel from "@/components/messaging/Channel";
-import ListChannels from "@/components/messaging/ListChannels";
+import CommunityPageContent from "@/components/communities/CommunityPageContent";
 
 async function fetchCommunity(community_id: string): Promise<Community | null> {
   try {
@@ -55,13 +53,12 @@ export default async function CommunityPage({
   }
 
   return (
-    <div>
-      <h1>Community Page for {community.name}</h1>
+    <div className="flex flex-col gap-4">
+      <h1 className="text-5xl">{community.name}</h1>
       <div>
-        <p>{community.description}</p>
+        <p className="text-base-400">{community.description}</p>
       </div>
-      <ListChannels communityId={community_id} />
-      {/* <ChatChannel channelId={community_id} /> */}
+      <CommunityPageContent community={community} />
     </div>
   );
 }
